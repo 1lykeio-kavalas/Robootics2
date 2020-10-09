@@ -1,0 +1,69 @@
+
+// Εισαγωγή βιβλιοθήκης 
+#include <Servo.h>
+
+//Ορισμός Pin για κάθε ένα Led καθώς και για τον αισθητήρα μας
+const int hygrometer =A0;
+int reading;
+int pinLED = 12;
+int pinLED2 = 8;
+int pinLED3 = 3;
+int pinLED4 = 4;
+int pinLED5 =7 ;
+int pinLED6 =5 ;
+int pos = 0;       //Αρχική θέση του Servo κινητήρα μας
+
+Servo myservo; 
+void setup() {
+  //Αρχικοποίηση 
+  Serial.begin(9600);
+  pinMode(12, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(5, OUTPUT);
+  myservo.attach(13); 
+}
+ 
+ void loop() {
+  //Mέτρηση Υγρασίας και ενεργοποίηση Led ανάλογα με την τιμή της μέτρησης
+   reading = analogRead(hygrometer);
+   reading = constrain(reading,0,1023);
+   reading = map(reading,0,1023,100,0);
+   Serial.print("Moisture: ");
+   Serial.print(reading);
+   Serial.print(" % ");     //Εμφάνιση ποσοστού υγρασίας 
+   Serial . println ();
+   delay(2000);            //Ενεργοποιηση και απενεργοποιηση των LED αναλογα με το ποσοστο % 
+   if(reading < 20){  
+     digitalWrite(pinLED5,LOW); 
+     digitalWrite(pinLED6,LOW);
+     digitalWrite(pinLED4,LOW);
+     digitalWrite(pinLED,HIGH);
+     digitalWrite(pinLED3,HIGH);
+     digitalWrite(pinLED2,HIGH);
+     delay(300);
+     digitalWrite (pinLED,LOW);
+     digitalWrite (pinLED3,LOW);
+     digitalWrite (pinLED2,LOW);
+ 
+     for (pos = 0; pos <= 180; pos += 1) { //κινηση του servo motor για ανοιγμα/κλεισιμο της βανας του νερου
+      
+      myservo.write(pos);             
+                            
+    }
+ 
+  }//if
+ 
+  if(reading > 20){
+
+   digitalWrite(pinLED5,HIGH);
+   digitalWrite(pinLED6,HIGH);
+   digitalWrite(pinLED4,HIGH);
+   for (pos = 180; pos >= 0; pos -= 1) {
+     myservo.write(pos);             
+                        
+   } //for
+  }// if 
+}
