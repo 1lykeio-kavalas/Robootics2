@@ -1,0 +1,142 @@
+//Εισαγωγή βιβλιοθηκης 
+#include <Servo.h>
+
+//Ορισμός Pin
+#define trigPin 33
+#define echoPin 35
+#define led 31
+#define led2 9
+#define led1 8
+#define KLIMATISTIKO 4
+#define KLIMATISTIKO1 11
+
+//Αρχικοποίηση
+Servo myservo;
+Servo myservo1;
+int pos = 0;
+int in = 0;
+
+
+void setup() {
+    Serial.begin(9600);
+    myservo.attach(6);
+    Serial.begin(9600);
+    myservo1.attach(10);
+    pinMode(13,OUTPUT);
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    pinMode(led, OUTPUT);
+    pinMode(led1, OUTPUT);
+    pinMode(led2, OUTPUT);
+    pinMode( KLIMATISTIKO , OUTPUT);
+    pinMode( KLIMATISTIKO1 , OUTPUT);
+}
+
+
+int state;
+void loop() {
+
+           // Λαμβάνω το μήνυμα της εφαρμογής και αναλόγως την τιμή της μεταβλητής ενεργοποιούμε- απενεργοποιούμε
+           // τα φώτα και τα συστήματα προστασίας απο τον ήλιο.
+            
+          if(Serial.available()>0){
+          state=Serial.read();    
+                if (state == 'a')
+                {
+                digitalWrite(13,HIGH);
+                delay(1000);
+                }
+                if(state =='b')
+                {
+                digitalWrite(13,LOW);
+                delay(1000);
+                }
+                if (state == 'h')
+                {
+                digitalWrite(led2,HIGH);
+                delay(1000);
+                }
+                if(state =='u')
+                    {
+                digitalWrite(led2,LOW);
+                delay(1000);
+                }
+                if (state == 'O')
+                {
+                digitalWrite( KLIMATISTIKO,HIGH);
+                delay(1000);
+                }
+                if(state =='X')
+                {
+                digitalWrite( KLIMATISTIKO,LOW);
+                delay(1000);
+                }
+                if (state == 's')
+                {
+                digitalWrite( KLIMATISTIKO1,HIGH);
+                delay(1000);
+                }
+                if(state =='y')
+                {
+                digitalWrite( KLIMATISTIKO1,LOW);
+                delay(1000);
+                }
+                if(state =='w')
+                {
+                    if(myservo.read()<20){
+                        for (pos = 0; pos <= 90; pos += 1) { 
+                        myservo.write(pos);
+                        delay(15);
+                        }
+                    }
+                }
+                if(state =='c')
+                {
+                  if(myservo.read()>20){  
+                        for (pos = 90; pos >= 0; pos -= 1) {
+                          myservo.write(pos); 
+                          delay(15);  
+                        }
+                  }     
+               }
+                if(state =='f')
+                {
+                  if(myservo1.read()<20){ 
+                    for (in = 0; in <= 90; in += 1) {    
+                      myservo1.write(in);
+                      delay(15);  
+                    }
+                  }
+                }
+              if(state =='k')
+              {
+                  if(myservo1.read()>20){   
+                      for (in = 90; in >= 0; in -= 1) {
+                      myservo1.write(in); 
+                      delay(15);                          
+                      }
+                  }
+             }
+          }// H μεγάλη if 
+
+
+          //'Ελεγχος αισθητήρα του Πάρκινγκ
+           long duration, distance;
+           digitalWrite(trigPin, LOW);  // Added this line
+           delayMicroseconds(2); // Added this line
+           digitalWrite(trigPin, HIGH);
+          //  delayMicroseconds(1000); - Removed this line
+           delayMicroseconds(10); // Added this line
+           digitalWrite(trigPin, LOW);
+           duration = pulseIn(echoPin, HIGH);
+           distance = (duration/2) / 29.1;
+           if (distance < 9){  // This is where the LED On/Off happens
+               digitalWrite(led,HIGH);
+               digitalWrite(led1,LOW);
+            }
+            else {
+                digitalWrite(led,LOW);
+               digitalWrite(led1,HIGH);
+            }
+} //loop
+
