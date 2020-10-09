@@ -1,0 +1,118 @@
+//Εισαγωγή βιβλιοθηκης 
+#include <Servo.h>
+
+#define trigPin 12
+#define echoPin 7
+
+int greenLedPin = 11;
+int yellowLedPin = 13;
+int redLedPin = 9;
+
+int lightSensorPin = A5;
+int analogValue =0;
+int allsnerPin = A2;
+int analogValue1 =0;
+int redLedPin1 = 8;
+int lightSensorPin2 = A1;
+int analogValue2 =0;
+
+int pos = 0; 
+
+int suma = 0;
+Servo myservo;
+
+//Αρχικοποίηση
+void setup() {
+    Serial.begin(9600);
+    myservo.attach(6);
+    pinMode(lightSensorPin2,INPUT);
+    pinMode(redLedPin1,OUTPUT);
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+    pinMode(greenLedPin, OUTPUT);
+    pinMode(yellowLedPin,OUTPUT);
+    pinMode(redLedPin,OUTPUT);
+    pinMode(lightSensorPin,INPUT);
+    pinMode(allsnerPin,INPUT);
+  
+}
+
+// Ανάγνωση αισθητήρων φωτός (3 αισθητήρες και ανάλογα με την τιμή της μεταβλητής 
+//ενεργοποιούμε / απενεργοποιούμε τα φώτα και τις τέντες.  
+
+void loop(){
+   long duration, distance;
+   digitalWrite(trigPin, LOW);  // Added this line
+   delayMicroseconds(2); // Added this line
+   digitalWrite(trigPin, HIGH);
+//  delayMicroseconds(1000); - Removed this line
+   delayMicroseconds(10); // Added this line
+   digitalWrite(trigPin, LOW);
+   duration = pulseIn(echoPin, HIGH);
+   distance = (duration/2) / 29.1;
+   analogValue = analogRead(lightSensorPin);
+   suma = suma + analogValue;
+   analogValue = analogRead(lightSensorPin);
+   suma = suma + analogValue;
+   analogValue = analogRead(lightSensorPin);
+   suma = suma + analogValue;
+   analogValue = suma /3;
+
+  analogValue = analogRead(lightSensorPin);
+  delay(50);
+  
+  if(analogValue <650){            
+    
+    digitalWrite(redLedPin, HIGH);    
+  }
+   
+  if(analogValue >640 ){
+ 
+        digitalWrite(redLedPin, LOW);
+  
+  }
+  else if  (distance <5) {  
+     digitalWrite(redLedPin,LOW);
+     digitalWrite(greenLedPin, LOW);
+     delay(10000);
+  }
+
+  analogValue1 = analogRead(allsnerPin);
+  if(analogValue1 <650){            
+    digitalWrite(greenLedPin, HIGH);
+    delay(200);
+  }
+  else if(analogValue1 >= 50 && analogValue1 <= 100){
+  }
+  else{
+     digitalWrite(greenLedPin, LOW);
+  }
+
+  analogValue2 = analogRead(lightSensorPin2);
+  
+  if(analogValue2 <800 ){
+      if(myservo.read()<20){
+          digitalWrite(redLedPin1, LOW);
+          for (pos = 0; pos <= 90; pos += 1) { 
+            
+            myservo.write(pos);
+            delay(15);
+          }
+      }
+  }
+
+
+ if(analogValue2 > 800 ){
+  
+    if(myservo.read()>20){
+      digitalWrite(redLedPin1, HIGH);
+      for (pos = 90; pos >= 0; pos -= 1) {
+        myservo.write(pos); 
+          delay(15);                              
+      }
+    }
+  }
+Serial.println(analogValue);
+delay(100);
+suma =0;
+}//loop
